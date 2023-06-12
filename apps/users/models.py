@@ -7,7 +7,7 @@ class User(AbstractUser):
         blank=True, 
         null=True
     )
-    proflie_image = models.ImageField(
+    profile_image = models.ImageField(
         upload_to='proflie_image/'
     )
     description = models.TextField(
