@@ -1,12 +1,13 @@
 from rest_framework import serializers
+from django.core.mail import send_mail
 from django.contrib.auth.password_validation import validate_password
-from apps.users.models import User
+from apps.users.models import User, EmailCheckCode
 from apps.posts.serializers import UserPostSerializer
 class UserSerializer(serializers.ModelSerializer):
     posts = UserPostSerializer(many=True, read_only=True)
     class Meta:
         model = User
-        fields = ('id','username', 'first_name', 'last_name', 'date_of_birth','profile_image','description','posts')
+        fields = ('id','username', 'first_name', 'last_name', 'date_of_birth','profile_image','description','posts', 'email')
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
@@ -27,3 +28,30 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+    
+class EmailCheck(serializers.ModelSerializer):
+    email = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ['email']
+    
+    def create(self, validated_data):
+        if User.objects.filter(email=validated_data['email']).exists():
+            user = User.objects.get(email = validated_data['email'])
+            code = EmailCheckCode.objects.create(user=user)
+            code.save()
+            email_body = f"""
+                Здравствуйте,
+                вот ваш ферифиционный код {code.code}
+            """
+            send_mail(
+                #subject 
+                    f"Код подтверждения", 
+                    #message 
+                    email_body, 
+                    #from email 
+                    'noreply@somehost.local', 
+                    #to email 
+                    [user.email] 
+            )
+            return f'{code.code}'
