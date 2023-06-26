@@ -61,6 +61,23 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     code = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
     confirm_password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
+    
     class Meta:
         model = User
         fields = ['code', 'password', 'confirm_password']
+       
+    def validate(self, attrs):
+        if attrs['password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({'password':"Пароли отличаются"})
+        if EmailCheckCode.objects.all().filter(code = attrs['code']).exists() == False:
+            raise serializers.ValidationError({'code':"Такого кода нет"})
+        return attrs
+     
+    def create(self, validated_data):
+        email_check = EmailCheckCode.objects.all().filter(code = validated_data['code'])
+        user = User.objects.get(email = email_check[0].email)
+        user.set_password(validated_data['password'])
+        user.save()
+        for i in email_check:
+            i.delete()
+        return user
