@@ -30,15 +30,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
     
 class EmailCheck(serializers.ModelSerializer):
-    email = serializers.CharField()
+    email = serializers.CharField(write_only=True)
+    code = serializers.CharField(read_only=True)
     class Meta:
-        model = User
-        fields = ['email']
+        model = EmailCheckCode
+        fields = ['email', 'code']
     
     def create(self, validated_data):
         if User.objects.filter(email=validated_data['email']).exists():
             user = User.objects.get(email = validated_data['email'])
-            code = EmailCheckCode.objects.create(user=user)
+            code = EmailCheckCode.objects.create(user=user, email=validated_data['email'])
             code.save()
             email_body = f"""
                 Здравствуйте,
@@ -54,4 +55,12 @@ class EmailCheck(serializers.ModelSerializer):
                     #to email 
                     [user.email] 
             )
-            return f'{code.code}'
+            return code
+        
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    code = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
+    confirm_password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
+    class Meta:
+        model = User
+        fields = ['code', 'password', 'confirm_password']

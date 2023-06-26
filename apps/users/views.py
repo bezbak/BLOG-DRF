@@ -14,5 +14,5 @@ class RegisterAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     
 class EmailCheckAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = EmailCheckCode.objects.all()
     serializer_class = EmailCheck
