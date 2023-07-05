@@ -23,3 +23,33 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
+        
+
+class Comment(models.Model):
+    text = models.CharField(
+        max_length=550
+    )
+    parent = models.ForeignKey(
+        'self',
+        related_name = 'child_comm',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    from_user = models.ForeignKey(
+        User,
+        related_name='comments',
+        on_delete=models.CASCADE
+    )
+    to_post = models.ForeignKey(
+        Post,
+        related_name='comments',
+        on_delete=models.CASCADE
+    )
+    
+    def __str__(self):
+        return f"{self.text[:10]} - {self.from_user.username}"
+    
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарийи'
