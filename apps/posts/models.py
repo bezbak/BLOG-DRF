@@ -17,6 +17,7 @@ class Post(models.Model):
     created = models.DateTimeField(
         auto_now_add=True
     )
+    
     def __str__(self):
         return f"{self.user.username}-Пост-{self.id}"
     
@@ -53,3 +54,22 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарийи'
+        
+class Like(models.Model):
+    from_user = models.ForeignKey(
+        User,
+        related_name='liked_posts',
+        on_delete=models.CASCADE
+    )
+    to_post = models.ForeignKey(
+        Post,
+        related_name='liked_users',
+        on_delete=models.CASCADE
+    )
+    
+    def __str__(self):
+        return f"{self.to_post.liked_users.count}-{self.to_post.id}"
+    
+    class Meta:
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
