@@ -4,12 +4,13 @@ from django.conf import settings
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from rest_framework import routers
-from apps.posts.views import PostViewSet
+from apps.posts.views import PostViewSet, CommentViewSet
 from apps.users.views import UsersViewSet
 
 router = routers.DefaultRouter()
 router.register(r'posts', PostViewSet)
 router.register(r'users', UsersViewSet)
+router.register(r'comments', CommentViewSet)
 
 api_urlpatterns = [
     path('users/', include('apps.users.urls')),
