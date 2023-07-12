@@ -5,6 +5,15 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = "__all__"
+    def create(self, validated_data):
+        try:
+            is_like = Like.objects.get(from_user = validated_data['from_user'], to_post = validated_data['to_post'])
+            is_like.delete()
+            return is_like
+        except:
+            is_like = Like.objects.create(from_user = validated_data['from_user'], to_post = validated_data['to_post'])
+            is_like.save()
+            return is_like
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

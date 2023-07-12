@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.password_validation import validate_password
 from apps.users.models import User, EmailCheckCode
 from apps.posts.serializers import UserPostSerializer
+import json
 class UserSerializer(serializers.ModelSerializer):
     posts = UserPostSerializer(many=True, read_only=True)
     class Meta:
@@ -81,3 +82,11 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         for i in email_check:
             i.delete()
         return user
+class UserLikesPosts(serializers.ModelSerializer):
+    posts = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ('id','username', 'first_name', 'last_name', 'date_of_birth','profile_image','description','posts', 'email')
+        
+    def get_posts(self,obj):
+        return json.dumps(obj.liked_posts.all(),indent=4,sort_keys=True)
