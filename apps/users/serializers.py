@@ -90,3 +90,9 @@ class UserLikesPosts(serializers.ModelSerializer):
         
     def get_posts(self,obj):
         return json.dumps(obj.liked_posts.all(),indent=4,sort_keys=True)
+    
+    
+class ChatUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username','profile_image')

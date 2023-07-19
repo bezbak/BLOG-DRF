@@ -1,0 +1,3 @@
+pip freeze - Список модулей
+pip freeze > requirements.txt - Сохраняет список модулей в текстовый файл
+pip install -r requirements.txt - Скачивает все модули записанные в requirements.txt
